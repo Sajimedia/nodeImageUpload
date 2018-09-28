@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Getting Image From The Folder</title>
+</head>
+<body>
+	<!-- <img src="Images/ffload.jpg"> -->
+	<div><img src="" id="show"></div>
+   	<div id="showServer"></div>
+	<input type="file" name="file" id="fileload">
+    <button type="button" id="upload">Upload Image</button>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src = "/socket.io/socket.io.js"></script>
+    <script>
+    	var socket = io();
+        var imageStrin='';
+        var fileName=''; 
+    	$("#fileload").on('change',function(e){
+       	  var input = e.target;
+          fileName = e.target.files[0].name;
+          console.log(fileName);
+       	  var reader = new FileReader();
+    	  reader.onload = function(ee){
+             //var dataURL = reader.result;
+     	     imageString=reader.result;
+     	     $('#show').attr('src',imageString);
+     	    };
+    	  reader.readAsDataURL(input.files[0]);	
+		});
+
+		$('#upload').on('click',function(){
+             var res = fileName.split(".");
+             console.log(res[0]); 
+			 socket.emit('image',{imageData:imageString,imageName:res[0]});
+		});
+
+		socket.on('broadcast',(pdata)=>{
+		   $('#showServer').empty();	
+		   $('#showServer').append('<img src='+pdata.path+'>');		
+		  console.log(pdata);
+		});
+    </script>
+</body>
+</html>
